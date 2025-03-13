@@ -22,7 +22,7 @@ class ProductController{
 
 
 
-  Future<void> createProduct(String name,String img,int qty,int price,int totalPrice) async {
+  Future<bool> createProduct(String name,String img,int qty,int price,int totalPrice) async {
     final response = await http.post(Uri.parse(Urls.createProduct),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
@@ -35,10 +35,17 @@ class ProductController{
         })
     );
 
-    print(response);
-    if (response.statusCode == 201) {
-      readProduct();
-    }
+    print(response.statusCode);
+    print(response.body);
+
+
+
+      if (response.statusCode == 200) {
+        return true;
+
+      }else{
+        return false;
+      }
   }
 
 
@@ -58,7 +65,7 @@ class ProductController{
 
 
 
-  Future<void> UpdateProduct(String id,String name,String img,int qty,int price,int totalPrice) async {
+  Future<bool> UpdateProduct(String id,String name,String img,int qty,int price,int totalPrice) async {
     final response = await http.post(Uri.parse(Urls.updateProduct(id)),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
@@ -71,9 +78,13 @@ class ProductController{
         })
     );
 
-    print(response);
-    if (response.statusCode == 201) {
-      readProduct();
+    print(response.statusCode);
+    print(response.body);
+    if (response.statusCode == 200) {
+      return true;
+
+    }else{
+      return false;
     }
   }
 

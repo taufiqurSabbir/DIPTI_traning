@@ -89,32 +89,74 @@ Future<void> getProduct() async {
                   SizedBox(
                     width: 5,
                   ),
-                  ElevatedButton(
-                      onPressed: () async {
-                        if (id == null) {
-                          productController.createProduct(
-                              productNameController.text,
-                              productImageController.text,
-                              int.parse(productQtyController.text),
-                              int.parse(productUnitPriceController.text),
-                              int.parse(productTotalPriceController.text));
-                        } else {
-                          productController.UpdateProduct(
-                              id,
-                              productNameController.text,
-                              productImageController.text,
-                              int.parse(productQtyController.text),
-                              int.parse(productUnitPriceController.text),
-                              int.parse(productTotalPriceController.text));
-                        }
+      ElevatedButton(
+        onPressed: () async {
+          if (id == null) {
+            productController
+                .createProduct(
+              productNameController.text,
+              productImageController.text,
+              int.parse(productQtyController.text),
+              int.parse(productUnitPriceController.text),
+              int.parse(productTotalPriceController.text),
+            )
+                .then((value) async {
+              if (value) {
+                await productController.readProduct();
+                setState(() {});
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Product added"),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Something went wrong, try again"),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            });
+          } else {
+            productController
+                .UpdateProduct(
+              id,
+              productNameController.text,
+              productImageController.text,
+              int.parse(productQtyController.text),
+              int.parse(productUnitPriceController.text),
+              int.parse(productTotalPriceController.text),
+            )
+                .then((value) async {
+              if (value) {
+                await productController.readProduct();
+                setState(() {});
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Product updated"),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Something went wrong, try again"),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            });
+          }
 
-                         await productController.readProduct();
-                        Navigator.pop(context);
-                        setState(() {});
-                      },
-                      child: Text(
-                          id == null ? 'Add product' : 'Update product')),
-                ],
+          await getProduct();
+          Navigator.pop(context);
+          setState(() {});
+        },
+        child: Text(id == null ? 'Add product' : 'Update product'),
+      ),
+      ],
               )
             ],
           ),
@@ -144,33 +186,48 @@ Future<void> getProduct() async {
               leading: Image.network(product.img.toString()),
               title: Text(product.productName.toString()),
               subtitle: Text('Price: ${product.unitPrice}| Qrt : ${product.qty}| Total: ${product.totalPrice} '),
-              trailing: IconButton(onPressed: (){
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(onPressed: (){
+                    productDialog(
+                      id: product.sId.toString(),
+                      name: product.productName.toString(),
+                      qty: product.qty,
+                      img: product.img.toString(),
+                      unitPrice: product.unitPrice,
+                      totalPrice: product.totalPrice
+                    );
+                  }, icon: Icon(Icons.edit,color: Colors.green,)),
+                  IconButton(onPressed: (){
 
-                productController.deleteProducts(product.sId.toString()).then((value) async {
-                  if (value) {
-                    await productController.readProduct();
-                    setState(() {
+                    productController.deleteProducts(product.sId.toString()).then((value) async {
+                      if (value) {
+                        await productController.readProduct();
+                        setState(() {
 
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Product deleted"),
+                            duration: Duration(seconds: 2),
+
+                          ),
+                        );
+                      }else{
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Something wrong try again"),
+                            duration: Duration(seconds: 2),
+
+                          ),
+                        );
+                      }
                     });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Product deleted"),
-                        duration: Duration(seconds: 2),
 
-                      ),
-                    );
-                  }else{
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Something wrong try again"),
-                        duration: Duration(seconds: 2),
-
-                      ),
-                    );
-                  }
-                });
-
-              }, icon: Icon(Icons.delete,color: Colors.red,)),
+                  }, icon: Icon(Icons.delete,color: Colors.red,)),
+                ],
+              ),
             ),
           );
           }),
