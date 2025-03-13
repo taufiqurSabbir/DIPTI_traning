@@ -90,7 +90,7 @@ Future<void> getProduct() async {
                     width: 5,
                   ),
                   ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (id == null) {
                           productController.createProduct(
                               productNameController.text,
@@ -99,16 +99,16 @@ Future<void> getProduct() async {
                               int.parse(productUnitPriceController.text),
                               int.parse(productTotalPriceController.text));
                         } else {
-                          //   productController.UpdateProduct(
-                          //       id,
-                          //       productNameController.text,
-                          //       productImageController.text,
-                          //       int.parse(productQtyController.text),
-                          //       int.parse(productUnitPriceController.text),
-                          //       int.parse(productTotalPriceController.text));
-                          // }
+                          productController.UpdateProduct(
+                              id,
+                              productNameController.text,
+                              productImageController.text,
+                              int.parse(productQtyController.text),
+                              int.parse(productUnitPriceController.text),
+                              int.parse(productTotalPriceController.text));
                         }
 
+                         await productController.readProduct();
                         Navigator.pop(context);
                         setState(() {});
                       },
@@ -146,10 +146,11 @@ Future<void> getProduct() async {
               subtitle: Text('Price: ${product.unitPrice}| Qrt : ${product.qty}| Total: ${product.totalPrice} '),
               trailing: IconButton(onPressed: (){
 
-                productController.deleteProducts(product.sId.toString()).then((value){
+                productController.deleteProducts(product.sId.toString()).then((value) async {
                   if (value) {
+                    await productController.readProduct();
                     setState(() {
-                      productController.readProduct();
+
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
